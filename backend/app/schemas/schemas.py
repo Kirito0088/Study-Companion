@@ -1,10 +1,20 @@
 """Pydantic v2 schemas for Study Companion API."""
 
-from pydantic import BaseModel
+from __future__ import annotations
+
+from datetime import datetime
 from typing import Optional, List
+from pydantic import BaseModel, ConfigDict
 
 
-# ── Shared ────────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+class _OrmBase(BaseModel):
+    """Base with ORM mode enabled for all response schemas."""
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ── User / Stats / Quote (dashboard composites) ───────────────────────────────
 
 class UserSchema(BaseModel):
     name: str
@@ -24,16 +34,18 @@ class QuoteSchema(BaseModel):
     author: str
 
 
-# ── Dashboard ─────────────────────────────────────────────────────────────────
+# ── Courses ───────────────────────────────────────────────────────────────────
 
-class CourseSchema(BaseModel):
+class CourseSchema(_OrmBase):
     id: str
     name: str
     code: str
     progress: int
     color: str
-    next_session: str
+    next_session: Optional[str] = None
 
+
+# ── Dashboard ─────────────────────────────────────────────────────────────────
 
 class PlanItemSchema(BaseModel):
     id: str
@@ -55,7 +67,7 @@ class DashboardResponse(BaseModel):
 
 # ── Planner ───────────────────────────────────────────────────────────────────
 
-class SessionSchema(BaseModel):
+class SessionSchema(_OrmBase):
     id: str
     subject: str
     topic: str
@@ -92,7 +104,7 @@ class PlannerResponse(BaseModel):
 
 # ── Assignments ───────────────────────────────────────────────────────────────
 
-class AssignmentSchema(BaseModel):
+class AssignmentSchema(_OrmBase):
     id: str
     title: str
     course: str
@@ -121,6 +133,7 @@ class CreateAssignmentRequest(BaseModel):
     course: str
     type: str
     due_date: str
+    status: str
     priority: str = "medium"
 
 
@@ -139,7 +152,7 @@ class AttachmentSchema(BaseModel):
     size: str
 
 
-class ChatMessageSchema(BaseModel):
+class ChatMessageSchema(_OrmBase):
     id: str
     role: str
     content: str

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-
 @import "tailwindcss";
 
 /* ── Design Tokens (Tailwind v4 theme) ──────────────────────────────────────── */
@@ -28,7 +26,7 @@
   --color-status-info: #3b82f6;
 
   /* Font */
-  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-plus-jakarta-sans), "Inter", system-ui, sans-serif;
 
   /* Border radius */
   --radius-xl: 12px;

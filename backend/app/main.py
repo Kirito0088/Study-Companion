@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.v1 import api_router
 from app.core.config import get_settings
 
@@ -25,6 +26,22 @@ app.add_middleware(
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(api_router)
+
+
+# ── Startup ───────────────────────────────────────────────────────────────────
+@app.on_event("startup")
+def on_startup():
+    """Create tables and seed initial data on first run."""
+    from app.db.session import create_tables, SessionLocal
+    from app.db.seed import seed_database
+
+    create_tables()
+
+    db = SessionLocal()
+    try:
+        seed_database(db)
+    finally:
+        db.close()
 
 
 # ── Health check ──────────────────────────────────────────────────────────────

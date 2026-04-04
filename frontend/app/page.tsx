@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Flame, Brain, TrendingUp, BookOpen, Quote } from "lucide-react";
 import { containerVariants as container, itemVariants as item } from "@/lib/utils/variants";
 import { StatCard, CourseCard, TodayPlan } from "@/components/features/dashboard";
-import type { PlanItem } from "@/components/features/dashboard";
+import type { PlanItem } from "@/types";
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 // Hardcoded for now. Replace with API call when backend is ready.
@@ -40,9 +40,9 @@ const COURSES = [
 ];
 
 const PLAN_ITEMS: PlanItem[] = [
-  { id: "p1", title: "Deep Focus Session",  description: "Concentrated study on Neural Plasticity models.", time: "09:00 AM", duration: "90 min", type: "focus"  },
-  { id: "p2", title: "Flashcard Review",    description: "Spaced repetition for Structural Systems deck.",  time: "11:30 AM", duration: "30 min", type: "review" },
-  { id: "p3", title: "Group Workshop",      description: "Peer review for Modernism case study.",           time: "02:00 PM", duration: "60 min", type: "group"  },
+  { id: "p1", title: "Deep Focus Session",  description: "Concentrated study on Neural Plasticity models.", time: "09:00 AM", duration: "90 min", type: "focus",  completed: false },
+  { id: "p2", title: "Flashcard Review",    description: "Spaced repetition for Structural Systems deck.",  time: "11:30 AM", duration: "30 min", type: "review", completed: false },
+  { id: "p3", title: "Group Workshop",      description: "Peer review for Modernism case study.",           time: "02:00 PM", duration: "60 min", type: "group",  completed: false },
 ];
 
 const QUOTE = {

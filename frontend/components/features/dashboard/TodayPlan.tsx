@@ -1,17 +1,9 @@
 import { motion } from "framer-motion";
 import { itemVariants as item } from "@/lib/utils/variants";
 import { cn } from "@/lib/utils/cn";
+import type { PlanItem } from "@/types";
 
 export type PlanItemType = "focus" | "review" | "group";
-
-export interface PlanItem {
-  id: string;
-  title: string;
-  description: string;
-  time: string;
-  duration: string;
-  type: PlanItemType;
-}
 
 interface TodayPlanProps {
   /** Date label shown below the section heading */

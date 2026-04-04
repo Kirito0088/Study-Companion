@@ -10,4 +10,4 @@
 export { StatCard } from "./StatCard";
 export { CourseCard } from "./CourseCard";
 export { TodayPlan } from "./TodayPlan";
-export type { PlanItem, PlanItemType } from "./TodayPlan";
+export type { PlanItemType } from "./TodayPlan";

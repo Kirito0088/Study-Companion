@@ -15,7 +15,6 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/study_companion"
-    USE_MOCK_DATA: bool = True  # Set False when DB is ready
 
     class Config:
         env_file = ".env"

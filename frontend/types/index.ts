@@ -120,7 +120,16 @@ export interface CreateAssignmentPayload {
   course: string;
   type: string;
   due_date: string;
+  status: AssignmentStatus;
   priority?: AssignmentPriority;
+}
+
+export interface AssignmentFormValues {
+  title: string;
+  dueDate: string;
+  subject: string;
+  type: string;
+  status: AssignmentStatus;
 }
 
 export interface UpdateAssignmentPayload {

@@ -8,5 +8,4 @@
  *   import { ChatBubble, TypingIndicator } from "@/components/features/chat";
  */
 
-// Exports will be added here as chat components are extracted from app/chat/page.tsx
-export {};
+export { ChatView } from "./ChatView";

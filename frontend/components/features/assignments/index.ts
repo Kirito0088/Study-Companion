@@ -8,5 +8,6 @@
  *   import { AssignmentRow, StatsCard } from "@/components/features/assignments";
  */
 
-// Exports will be added here as assignment components are extracted from app/assignments/page.tsx
-export {};
+export { AssignmentsView } from "./AssignmentsView";
+export { AssignmentRow } from "./AssignmentRow";
+export { AddAssignmentModal } from "./AddAssignmentModal";

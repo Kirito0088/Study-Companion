@@ -1,0 +1,26 @@
+{
+  "name": "study-companion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names \"FE,BE\" --prefix-colors \"green,blue\" \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "cd backend && python -m uvicorn app.main:app --port 8000",
+    "start": "npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kirito0088/Study-Companion.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kirito0088/Study-Companion/issues"
+  },
+  "homepage": "https://github.com/Kirito0088/Study-Companion#readme",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
