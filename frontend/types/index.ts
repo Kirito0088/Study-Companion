@@ -134,6 +134,7 @@ export interface AssignmentFormValues {
 
 export interface UpdateAssignmentPayload {
   title?: string;
+  due_date?: string;
   status?: AssignmentStatus;
   priority?: AssignmentPriority;
   grade?: string;

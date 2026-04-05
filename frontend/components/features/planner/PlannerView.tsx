@@ -20,6 +20,7 @@ import type { CurriculumItem, Nudge, Session } from "@/types";
 import { usePlannerData } from "@/lib/hooks/usePlannerData";
 import { usePlanner } from "@/lib/hooks/usePlanner";
 import { useCalendar } from "@/lib/hooks/useCalendar";
+import { useDragAndDrop } from "@/lib/hooks/useDragAndDrop";
 import { PlannerAssignmentsPanel } from "@/components/features/planner/PlannerAssignmentsPanel";
 import { PlannerCalendar } from "@/components/features/planner/PlannerCalendar";
 import { containerVariants as container, itemVariants as item } from "@/lib/utils/variants";
@@ -161,6 +162,7 @@ export function PlannerView() {
   const data = usePlannerData();
   const assignments = usePlanner();
   const calendar = useCalendar();
+  const dnd = useDragAndDrop();
 
   const selectedDayData = calendar.selectedDate
     ? calendar.calendarDays.find((d) => d.date.getTime() === calendar.selectedDate?.getTime())
@@ -197,6 +199,7 @@ export function PlannerView() {
         onNextMonth={calendar.goToNextMonth}
         selectedDate={calendar.selectedDate}
         onSelectDate={calendar.toggleDate}
+        dragAndDrop={dnd}
       />
 
       {/* Selected Date Panel */}
@@ -212,15 +215,22 @@ export function PlannerView() {
             <p className="text-xs text-text-muted py-2">No assignments due on this day. 🎉</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {selectedDayData.assignments.map((a) => (
-                <div key={a.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface-hover/50 border border-surface-border">
-                  <span className={cn("w-2 h-2 rounded-full flex-shrink-0", priorityDot[a.priority] ?? "bg-text-muted")} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-text-primary truncate">{a.title}</p>
-                    <p className="text-xs text-text-muted mt-0.5">{a.course} · {a.type}</p>
+              {selectedDayData.assignments.map((a) => {
+                const dragProps = dnd.getDragProps(a.id);
+                return (
+                  <div
+                    key={a.id}
+                    {...dragProps}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-surface-hover/50 border border-surface-border cursor-grab active:cursor-grabbing select-none"
+                  >
+                    <span className={cn("w-2 h-2 rounded-full flex-shrink-0", priorityDot[a.priority] ?? "bg-text-muted")} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-text-primary truncate">{a.title}</p>
+                      <p className="text-xs text-text-muted mt-0.5">{a.course} · {a.type}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </motion.div>
@@ -308,6 +318,7 @@ export function PlannerView() {
             urgent={assignments.urgent}
             upcoming={assignments.upcoming}
             isLoading={assignments.isLoading}
+            getDragProps={dnd.getDragProps}
           />
         </motion.div>
       </div>

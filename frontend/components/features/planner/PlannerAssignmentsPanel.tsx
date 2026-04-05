@@ -2,6 +2,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, CalendarCheck, CalendarClock, Loader2 } from "lucide-react";
 import type { Assignment } from "@/types";
+import type { DragAndDropHandlers } from "@/lib/hooks/useDragAndDrop";
 import { itemVariants as item } from "@/lib/utils/variants";
 import { cn } from "@/lib/utils/cn";
 
@@ -13,9 +14,22 @@ const priorityDot: Record<string, string> = {
   low:    "bg-status-success",
 };
 
-const AssignmentRow = memo(function AssignmentRow({ a }: { a: Assignment }) {
+const AssignmentRow = memo(function AssignmentRow({
+  a,
+  getDragProps,
+}: {
+  a: Assignment;
+  getDragProps?: DragAndDropHandlers["getDragProps"];
+}) {
+  const dragProps = getDragProps ? getDragProps(a.id) : {};
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b border-surface-border last:border-0">
+    <div
+      {...dragProps}
+      className={cn(
+        "flex items-center gap-3 py-2.5 border-b border-surface-border last:border-0",
+        getDragProps && "cursor-grab active:cursor-grabbing select-none",
+      )}
+    >
       <span className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", priorityDot[a.priority] ?? "bg-text-muted")} />
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold text-text-primary truncate">{a.title}</p>
@@ -32,6 +46,7 @@ interface SectionProps {
   items: Assignment[];
   emptyText: string;
   accentClass: string;
+  getDragProps?: DragAndDropHandlers["getDragProps"];
 }
 
 const AssignmentSection = memo(function AssignmentSection({
@@ -40,6 +55,7 @@ const AssignmentSection = memo(function AssignmentSection({
   items,
   emptyText,
   accentClass,
+  getDragProps,
 }: SectionProps) {
   return (
     <div>
@@ -51,7 +67,7 @@ const AssignmentSection = memo(function AssignmentSection({
       {items.length === 0 ? (
         <p className="text-[10px] text-text-muted py-1 pl-4">{emptyText}</p>
       ) : (
-        items.map((a) => <AssignmentRow key={a.id} a={a} />)
+        items.map((a) => <AssignmentRow key={a.id} a={a} getDragProps={getDragProps} />)
       )}
     </div>
   );
@@ -64,6 +80,8 @@ export interface PlannerAssignmentsPanelProps {
   urgent: Assignment[];
   upcoming: Assignment[];
   isLoading: boolean;
+  /** Optional drag handlers from useDragAndDrop — enables dragging from the panel. */
+  getDragProps?: DragAndDropHandlers["getDragProps"];
 }
 
 /**
@@ -77,6 +95,7 @@ export const PlannerAssignmentsPanel = memo(function PlannerAssignmentsPanel({
   urgent,
   upcoming,
   isLoading,
+  getDragProps,
 }: PlannerAssignmentsPanelProps) {
   return (
     <motion.div variants={item} className="glass-card p-5">
@@ -98,6 +117,7 @@ export const PlannerAssignmentsPanel = memo(function PlannerAssignmentsPanel({
             items={today}
             emptyText="Nothing due today."
             accentClass="text-status-error"
+            getDragProps={getDragProps}
           />
           <AssignmentSection
             icon={<AlertTriangle size={13} />}
@@ -105,6 +125,7 @@ export const PlannerAssignmentsPanel = memo(function PlannerAssignmentsPanel({
             items={urgent}
             emptyText="No urgent assignments."
             accentClass="text-status-warning"
+            getDragProps={getDragProps}
           />
           <AssignmentSection
             icon={<CalendarClock size={13} />}
@@ -112,6 +133,7 @@ export const PlannerAssignmentsPanel = memo(function PlannerAssignmentsPanel({
             items={upcoming}
             emptyText="No upcoming assignments."
             accentClass="text-primary"
+            getDragProps={getDragProps}
           />
         </div>
       )}

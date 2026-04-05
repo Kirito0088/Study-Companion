@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { itemVariants as item } from "@/lib/utils/variants";
 import type { CalendarDay } from "@/lib/hooks/useCalendar";
+import type { DragAndDropHandlers } from "@/lib/hooks/useDragAndDrop";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -25,23 +26,36 @@ function dotColor(day: CalendarDay): string {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-const DayCell = memo(function DayCell({ day, isSelected, onSelect }: { day: CalendarDay, isSelected: boolean, onSelect?: (date: Date) => void }) {
+interface DayCellProps {
+  day: CalendarDay;
+  isSelected: boolean;
+  isDragOver: boolean;
+  onSelect?: (date: Date) => void;
+  dropProps?: ReturnType<DragAndDropHandlers["getDropProps"]>;
+}
+
+const DayCell = memo(function DayCell({ day, isSelected, isDragOver, onSelect, dropProps }: DayCellProps) {
   const hasAssignments = day.assignments.length > 0;
 
   return (
     <div
       onClick={() => day.isCurrentMonth && onSelect?.(day.date)}
+      {...(day.isCurrentMonth ? dropProps : {})}
       className={cn(
         "relative flex flex-col items-center justify-start pt-1.5 pb-1 min-h-[52px] rounded-lg transition-colors",
         day.isCurrentMonth ? "cursor-pointer" : "cursor-default",
         // Filler days from adjacent months
         !day.isCurrentMonth && "opacity-30",
-        // Highlight logic (selected wins over today)
-        isSelected
-          ? "bg-primary/20 ring-1 ring-primary"
-          : day.isToday
-            ? "bg-primary/15 ring-1 ring-primary/40"
-            : day.isCurrentMonth && "hover:bg-surface-hover",
+        // Drag-over highlight (only for current-month cells)
+        isDragOver && day.isCurrentMonth && "bg-primary/10 ring-1 ring-primary/50",
+        // Normal highlight logic (selected wins over today, drag-over wins if active)
+        !isDragOver && (
+          isSelected
+            ? "bg-primary/20 ring-1 ring-primary"
+            : day.isToday
+              ? "bg-primary/15 ring-1 ring-primary/40"
+              : day.isCurrentMonth && "hover:bg-surface-hover"
+        ),
       )}
     >
       {/* Day number */}
@@ -90,6 +104,8 @@ export interface PlannerCalendarProps {
   /** Optional date selection */
   selectedDate?: Date | null;
   onSelectDate?: (date: Date) => void;
+  /** Optional drag-and-drop handlers from useDragAndDrop. */
+  dragAndDrop?: DragAndDropHandlers;
 }
 
 /**
@@ -105,6 +121,7 @@ export const PlannerCalendar = memo(function PlannerCalendar({
   onNextMonth,
   selectedDate,
   onSelectDate,
+  dragAndDrop,
 }: PlannerCalendarProps) {
   const monthLabel = currentMonth.toLocaleDateString(undefined, {
     month: "long",
@@ -175,14 +192,19 @@ export const PlannerCalendar = memo(function PlannerCalendar({
 
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-0.5">
-        {calendarDays.map((day) => (
-          <DayCell 
-            key={day.date.toISOString()} 
-            day={day} 
-            isSelected={selectedDate?.getTime() === day.date.getTime()}
-            onSelect={onSelectDate}
-          />
-        ))}
+        {calendarDays.map((day) => {
+          const dateKey = `${day.date.getFullYear()}-${String(day.date.getMonth() + 1).padStart(2, "0")}-${String(day.date.getDate()).padStart(2, "0")}`;
+          return (
+            <DayCell
+              key={day.date.toISOString()}
+              day={day}
+              isSelected={selectedDate?.getTime() === day.date.getTime()}
+              isDragOver={dragAndDrop?.dragOverKey === dateKey}
+              onSelect={onSelectDate}
+              dropProps={dragAndDrop?.getDropProps(day.date)}
+            />
+          );
+        })}
       </div>
 
       {/* Legend */}
