@@ -97,7 +97,7 @@ export const PlannerCalendar = memo(function PlannerCalendar({
   onPrevMonth,
   onNextMonth,
 }: PlannerCalendarProps) {
-  const monthLabel = currentMonth.toLocaleDateString("en-US", {
+  const monthLabel = currentMonth.toLocaleDateString(undefined, {
     month: "long",
     year: "numeric",
   });
