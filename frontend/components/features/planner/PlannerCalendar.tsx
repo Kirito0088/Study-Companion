@@ -41,7 +41,7 @@ const DayCell = memo(function DayCell({ day, isSelected, onSelect }: { day: Cale
           ? "bg-primary/20 ring-1 ring-primary"
           : day.isToday
             ? "bg-primary/15 ring-1 ring-primary/40"
-            : "hover:bg-surface-hover",
+            : day.isCurrentMonth && "hover:bg-surface-hover",
       )}
     >
       {/* Day number */}
