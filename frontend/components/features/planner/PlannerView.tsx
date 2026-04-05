@@ -17,7 +17,9 @@ import {
 import type { CurriculumItem, Nudge, Session } from "@/types";
 import { usePlannerData } from "@/lib/hooks/usePlannerData";
 import { usePlanner } from "@/lib/hooks/usePlanner";
+import { useCalendar } from "@/lib/hooks/useCalendar";
 import { PlannerAssignmentsPanel } from "@/components/features/planner/PlannerAssignmentsPanel";
+import { PlannerCalendar } from "@/components/features/planner/PlannerCalendar";
 import { containerVariants as container, itemVariants as item } from "@/lib/utils/variants";
 
 const sessionHover = { scale: 1.01 };
@@ -150,6 +152,7 @@ const NudgeCard = memo(function NudgeCard({ nudge }: { nudge: Nudge }) {
 export function PlannerView() {
   const data = usePlannerData();
   const assignments = usePlanner();
+  const calendar = useCalendar();
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 max-w-6xl">
@@ -173,6 +176,12 @@ export function PlannerView() {
           </button>
         </div>
       </motion.div>
+
+      {/* Full-width calendar — between hero and main grid */}
+      <PlannerCalendar
+        currentMonth={calendar.currentMonth}
+        calendarDays={calendar.calendarDays}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <motion.div variants={item} className="lg:col-span-2 space-y-4">
