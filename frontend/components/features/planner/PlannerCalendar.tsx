@@ -30,9 +30,10 @@ const DayCell = memo(function DayCell({ day, isSelected, onSelect }: { day: Cale
 
   return (
     <div
-      onClick={() => onSelect?.(day.date)}
+      onClick={() => day.isCurrentMonth && onSelect?.(day.date)}
       className={cn(
-        "relative flex flex-col items-center justify-start pt-1.5 pb-1 min-h-[52px] rounded-lg transition-colors cursor-pointer",
+        "relative flex flex-col items-center justify-start pt-1.5 pb-1 min-h-[52px] rounded-lg transition-colors",
+        day.isCurrentMonth ? "cursor-pointer" : "cursor-default",
         // Filler days from adjacent months
         !day.isCurrentMonth && "opacity-30",
         // Highlight logic (selected wins over today)
