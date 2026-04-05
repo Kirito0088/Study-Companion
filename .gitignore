@@ -35,7 +35,8 @@ Thumbs.db
 # frontend/lib/ (hooks, api, utils) must NEVER be ignored — it is source code.
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Dependencies — never commit node_modules
+# Dependencies — never commit node_modules (root or nested)
+node_modules/
 frontend/node_modules/
 
 # Next.js build output and cache
