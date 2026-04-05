@@ -28,8 +28,11 @@ export interface CalendarData {
   goToNextMonth: () => void;
   /** Currently selected date, if any. */
   selectedDate: Date | null;
-  /** Callback to set the selected date. */
-  setSelectedDate: (date: Date | null) => void;
+  /**
+   * Toggles selection: clicking the same date deselects it (null),
+   * clicking a different date selects it. Stable reference.
+   */
+  toggleDate: (date: Date) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -140,6 +143,12 @@ export function useCalendar(): CalendarData {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+  const toggleDate = useCallback((date: Date) => {
+    setSelectedDate((prev) =>
+      prev?.getTime() === date.getTime() ? null : date
+    );
+  }, []);
+
   // Re-derive only when assignments or displayed month changes.
   const calendarDays = useMemo<CalendarDay[]>(() => {
     const today = todayMidnight();
@@ -162,5 +171,5 @@ export function useCalendar(): CalendarData {
     return buildCalendarDays(currentMonth, byDate, todayKey);
   }, [assignments, currentMonth]);
 
-  return { currentMonth, calendarDays, goToPrevMonth, goToNextMonth, selectedDate, setSelectedDate };
+  return { currentMonth, calendarDays, goToPrevMonth, goToNextMonth, selectedDate, toggleDate };
 }

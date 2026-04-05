@@ -196,7 +196,7 @@ export function PlannerView() {
         onPrevMonth={calendar.goToPrevMonth}
         onNextMonth={calendar.goToNextMonth}
         selectedDate={calendar.selectedDate}
-        onSelectDate={calendar.setSelectedDate}
+        onSelectDate={calendar.toggleDate}
       />
 
       {/* Selected Date Panel */}
