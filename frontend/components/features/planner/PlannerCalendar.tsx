@@ -25,19 +25,22 @@ function dotColor(day: CalendarDay): string {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-const DayCell = memo(function DayCell({ day }: { day: CalendarDay }) {
+const DayCell = memo(function DayCell({ day, isSelected, onSelect }: { day: CalendarDay, isSelected: boolean, onSelect?: (date: Date) => void }) {
   const hasAssignments = day.assignments.length > 0;
 
   return (
     <div
+      onClick={() => onSelect?.(day.date)}
       className={cn(
-        "relative flex flex-col items-center justify-start pt-1.5 pb-1 min-h-[52px] rounded-lg transition-colors",
+        "relative flex flex-col items-center justify-start pt-1.5 pb-1 min-h-[52px] rounded-lg transition-colors cursor-pointer",
         // Filler days from adjacent months
         !day.isCurrentMonth && "opacity-30",
-        // Today highlight
-        day.isToday
-          ? "bg-primary/15 ring-1 ring-primary/40"
-          : "hover:bg-surface-hover",
+        // Highlight logic (selected wins over today)
+        isSelected
+          ? "bg-primary/20 ring-1 ring-primary"
+          : day.isToday
+            ? "bg-primary/15 ring-1 ring-primary/40"
+            : "hover:bg-surface-hover",
       )}
     >
       {/* Day number */}
@@ -83,6 +86,9 @@ export interface PlannerCalendarProps {
   /** Optional month navigation — if omitted, navigation buttons are hidden. */
   onPrevMonth?: () => void;
   onNextMonth?: () => void;
+  /** Optional date selection */
+  selectedDate?: Date | null;
+  onSelectDate?: (date: Date) => void;
 }
 
 /**
@@ -96,6 +102,8 @@ export const PlannerCalendar = memo(function PlannerCalendar({
   calendarDays,
   onPrevMonth,
   onNextMonth,
+  selectedDate,
+  onSelectDate,
 }: PlannerCalendarProps) {
   const monthLabel = currentMonth.toLocaleDateString(undefined, {
     month: "long",
@@ -167,7 +175,12 @@ export const PlannerCalendar = memo(function PlannerCalendar({
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-0.5">
         {calendarDays.map((day) => (
-          <DayCell key={day.date.toISOString()} day={day} />
+          <DayCell 
+            key={day.date.toISOString()} 
+            day={day} 
+            isSelected={selectedDate?.getTime() === day.date.getTime()}
+            onSelect={onSelectDate}
+          />
         ))}
       </div>
 

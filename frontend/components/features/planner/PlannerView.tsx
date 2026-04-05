@@ -7,6 +7,7 @@ import {
   BookMarked,
   Brain,
   Calendar,
+  CalendarCheck,
   Clock,
   Coffee,
   Droplets,
@@ -14,6 +15,7 @@ import {
   Play,
   Target,
 } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 import type { CurriculumItem, Nudge, Session } from "@/types";
 import { usePlannerData } from "@/lib/hooks/usePlannerData";
 import { usePlanner } from "@/lib/hooks/usePlanner";
@@ -42,6 +44,12 @@ const nudgeColors: Record<string, string> = {
   high: "border-primary/30 bg-primary/5 text-primary",
   medium: "border-status-warning/30 bg-status-warning/5 text-status-warning",
   low: "border-status-success/30 bg-status-success/5 text-status-success",
+};
+
+const priorityDot: Record<string, string> = {
+  high:   "bg-status-error",
+  medium: "bg-status-warning",
+  low:    "bg-status-success",
 };
 
 const PlannerSessionCard = memo(function PlannerSessionCard({ session }: { session: Session }) {
@@ -154,6 +162,10 @@ export function PlannerView() {
   const assignments = usePlanner();
   const calendar = useCalendar();
 
+  const selectedDayData = calendar.selectedDate
+    ? calendar.calendarDays.find((d) => d.date.getTime() === calendar.selectedDate?.getTime())
+    : null;
+
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 max-w-6xl">
       <motion.div variants={item} className="glass-card p-6 relative overflow-hidden">
@@ -183,7 +195,36 @@ export function PlannerView() {
         calendarDays={calendar.calendarDays}
         onPrevMonth={calendar.goToPrevMonth}
         onNextMonth={calendar.goToNextMonth}
+        selectedDate={calendar.selectedDate}
+        onSelectDate={calendar.setSelectedDate}
       />
+
+      {/* Selected Date Panel */}
+      {selectedDayData && (
+        <motion.div variants={item} className="glass-card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarCheck size={15} className="text-primary" />
+            <h3 className="text-sm font-semibold text-text-primary">
+              Assignments for {selectedDayData.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+            </h3>
+          </div>
+          {selectedDayData.assignments.length === 0 ? (
+            <p className="text-xs text-text-muted py-2">No assignments due on this day. 🎉</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {selectedDayData.assignments.map((a) => (
+                <div key={a.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface-hover/50 border border-surface-border">
+                  <span className={cn("w-2 h-2 rounded-full flex-shrink-0", priorityDot[a.priority] ?? "bg-text-muted")} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-text-primary truncate">{a.title}</p>
+                    <p className="text-xs text-text-muted mt-0.5">{a.course} · {a.type}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <motion.div variants={item} className="lg:col-span-2 space-y-4">

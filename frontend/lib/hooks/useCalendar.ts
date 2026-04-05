@@ -26,6 +26,10 @@ export interface CalendarData {
   goToPrevMonth: () => void;
   /** Navigate one month forward. Stable reference — safe to use in event handlers. */
   goToNextMonth: () => void;
+  /** Currently selected date, if any. */
+  selectedDate: Date | null;
+  /** Callback to set the selected date. */
+  setSelectedDate: (date: Date | null) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -134,6 +138,8 @@ export function useCalendar(): CalendarData {
     setCurrentMonth((prev) => monthStart(prev.getFullYear(), prev.getMonth() + 1));
   }, []);
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
   // Re-derive only when assignments or displayed month changes.
   const calendarDays = useMemo<CalendarDay[]>(() => {
     const today = todayMidnight();
@@ -156,5 +162,5 @@ export function useCalendar(): CalendarData {
     return buildCalendarDays(currentMonth, byDate, todayKey);
   }, [assignments, currentMonth]);
 
-  return { currentMonth, calendarDays, goToPrevMonth, goToNextMonth };
+  return { currentMonth, calendarDays, goToPrevMonth, goToNextMonth, selectedDate, setSelectedDate };
 }
