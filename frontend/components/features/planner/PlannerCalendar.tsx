@@ -9,10 +9,6 @@ import type { CalendarDay } from "@/lib/hooks/useCalendar";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-] as const;
 
 // Priority colour for assignment dots (highest-priority assignment wins)
 const PRIORITY_DOT: Record<string, string> = {
@@ -101,7 +97,10 @@ export const PlannerCalendar = memo(function PlannerCalendar({
   onPrevMonth,
   onNextMonth,
 }: PlannerCalendarProps) {
-  const monthLabel = `${MONTH_NAMES[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+  const monthLabel = currentMonth.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
   const totalAssignments = calendarDays.reduce(
     (sum, d) => sum + (d.isCurrentMonth ? d.assignments.length : 0),
     0,
