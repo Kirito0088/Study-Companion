@@ -1,62 +1,125 @@
-# General
-.DS_Store
-.vscode/
+# ══════════════════════════════════════════════════════════════════════════════
+# Study Companion — Root .gitignore
+#
+# Rules are intentionally EXPLICIT and SCOPED to prevent accidental exclusion
+# of source code. Avoid bare directory names (e.g. lib/, build/) at root level
+# as they can silently swallow unrelated directories like frontend/lib/.
+# ══════════════════════════════════════════════════════════════════════════════
 
-# Environment Variables
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+
+.DS_Store
+Thumbs.db
+
+# VS Code workspace settings are machine-specific; the .vscode/extensions.json
+# can be committed if desired, but settings.json and launch.json should not be.
+.vscode/settings.json
+.vscode/launch.json
+.vscode/*.code-workspace
+
+
+# ── Environment Variables ─────────────────────────────────────────────────────
+# Never commit secrets. Each environment maintains its own .env.* file.
+
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Frontend (Node.js/Next.js)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# FRONTEND  (Next.js / Node.js)
+# All rules are prefixed with 'frontend/' to avoid false matches elsewhere.
+# frontend/lib/ (hooks, api, utils) must NEVER be ignored — it is source code.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Dependencies — never commit node_modules
 frontend/node_modules/
+
+# Next.js build output and cache
 frontend/.next/
 frontend/out/
-frontend/build/
+
+# Vercel deployment artefacts
 frontend/.vercel/
+
+# Package manager debug logs
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/.pnpm-debug.log*
 
-# Backend (Python/FastAPI)
+# TypeScript incremental build info (regenerated automatically)
+frontend/tsconfig.tsbuildinfo
+
+# Temporary debug / log files created during development
+frontend/out_help.log
+frontend/out_help2.log
+frontend/dev_debug.log
+frontend/dev_debug2.log
+frontend/out.log
+
+# Explicitly ensure frontend source directories are ALWAYS tracked:
+# !frontend/lib/        ← hooks, api client, utilities
+# !frontend/components/ ← all UI components
+# !frontend/app/        ← Next.js App Router pages
+# !frontend/types/      ← TypeScript interfaces
+# (These are here as documentation; gitignore negations are only needed
+#  if a parent rule matched them — scoping above prevents that.)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# BACKEND  (Python / FastAPI)
+# All rules are scoped to 'backend/' or use extension patterns (*.pyc etc.)
+# to avoid matching frontend directories with the same name.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Virtual environment — never commit, always recreate
+backend/venv/
 venv/
-__pycache__/
+
+# Python bytecode — generated automatically, not source
+**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-# Python lib directories (scoped to avoid matching frontend/lib/)
+
+# Python packaging artefacts (only relevant inside backend)
+backend/build/
+backend/dist/
+backend/develop-eggs/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
 backend/lib/
 backend/lib64/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/share/python-wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+backend/MANIFEST
 
-# Pytest / Coverage
+# Environment / runtime
+.Python
+backend/env/
+
+
+# ── Pytest / Coverage ─────────────────────────────────────────────────────────
+
 .coverage
-.tox/
-.nox/
 .coverage.*
-.cache
-nosetests.xml
 coverage.xml
 *.cover
 *.py,cover
+nosetests.xml
 .hypothesis/
 .pytest_cache/
+.tox/
+.nox/
+.cache
