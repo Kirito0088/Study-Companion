@@ -181,6 +181,8 @@ export function PlannerView() {
       <PlannerCalendar
         currentMonth={calendar.currentMonth}
         calendarDays={calendar.calendarDays}
+        onPrevMonth={calendar.goToPrevMonth}
+        onNextMonth={calendar.goToNextMonth}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

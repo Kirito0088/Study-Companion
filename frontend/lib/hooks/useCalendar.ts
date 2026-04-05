@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { assignmentSelectors, useAssignmentStore } from "@/lib/hooks/useAssignmentStore";
 import type { Assignment } from "@/types";
 
@@ -22,6 +22,10 @@ export interface CalendarData {
   currentMonth: Date;
   /** Flat array of 35 or 42 cells (5 or 6 complete weeks, Sunday-first). */
   calendarDays: CalendarDay[];
+  /** Navigate one month back. Stable reference — safe to use in event handlers. */
+  goToPrevMonth: () => void;
+  /** Navigate one month forward. Stable reference — safe to use in event handlers. */
+  goToNextMonth: () => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -37,6 +41,13 @@ function toDateKey(d: Date): string {
 /** Local-midnight Date for today. */
 function todayMidnight(): Date {
   const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/** Returns a local-midnight Date representing the 1st of the given year/month. */
+function monthStart(year: number, month: number): Date {
+  const d = new Date(year, month, 1);
   d.setHours(0, 0, 0, 0);
   return d;
 }
@@ -58,16 +69,14 @@ function buildCalendarDays(
   firstOfMonth.setHours(0, 0, 0, 0);
 
   // Day-of-week for the 1st (0 = Sun). This is how many leading filler days we need.
-  const leadingBlanks = firstOfMonth.getDay(); // Sunday = 0
+  const leadingBlanks = firstOfMonth.getDay();
 
   // Last day of the month
   const lastOfMonth = new Date(year, month + 1, 0);
   lastOfMonth.setHours(0, 0, 0, 0);
 
-  // Total days so far (leading fillers + actual month days)
-  const usedCells = leadingBlanks + lastOfMonth.getDate();
-
   // Round up to the next full week
+  const usedCells = leadingBlanks + lastOfMonth.getDate();
   const totalCells = Math.ceil(usedCells / 7) * 7;
 
   const days: CalendarDay[] = [];
@@ -95,16 +104,38 @@ function buildCalendarDays(
 /**
  * useCalendar
  *
- * Reads assignments from the shared Zustand store, groups non-completed
- * assignments by due_date, and generates a full monthly calendar grid
- * (Sunday-first, 5 or 6 complete weeks).
+ * Manages the displayed month via local useState, and re-derives the
+ * calendar grid whenever the month or assignments change.
+ *
+ * Exposes:
+ *   - currentMonth  — the Date representing the 1st of the displayed month
+ *   - calendarDays  — flat Sunday-first grid (35 or 42 cells)
+ *   - goToPrevMonth — stable callback to move one month back
+ *   - goToNextMonth — stable callback to move one month forward
  *
  * No additional API calls — re-uses data already fetched by useAssignmentStore.
  */
 export function useCalendar(): CalendarData {
   const assignments = useAssignmentStore(assignmentSelectors.assignments);
 
-  return useMemo<CalendarData>(() => {
+  // Initialise to the 1st of the current local month.
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => {
+    const today = todayMidnight();
+    return monthStart(today.getFullYear(), today.getMonth());
+  });
+
+  // Stable navigation callbacks — useCallback with setCurrentMonth function
+  // form means these never need to be recreated.
+  const goToPrevMonth = useCallback(() => {
+    setCurrentMonth((prev) => monthStart(prev.getFullYear(), prev.getMonth() - 1));
+  }, []);
+
+  const goToNextMonth = useCallback(() => {
+    setCurrentMonth((prev) => monthStart(prev.getFullYear(), prev.getMonth() + 1));
+  }, []);
+
+  // Re-derive only when assignments or displayed month changes.
+  const calendarDays = useMemo<CalendarDay[]>(() => {
     const today = todayMidnight();
     const todayKey = toDateKey(today);
 
@@ -122,12 +153,8 @@ export function useCalendar(): CalendarData {
       }
     }
 
-    // Use the current month as the display month.
-    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    currentMonth.setHours(0, 0, 0, 0);
+    return buildCalendarDays(currentMonth, byDate, todayKey);
+  }, [assignments, currentMonth]);
 
-    const calendarDays = buildCalendarDays(currentMonth, byDate, todayKey);
-
-    return { currentMonth, calendarDays };
-  }, [assignments]);
+  return { currentMonth, calendarDays, goToPrevMonth, goToNextMonth };
 }
